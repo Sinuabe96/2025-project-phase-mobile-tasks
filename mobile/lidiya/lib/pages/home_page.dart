@@ -32,7 +32,7 @@ class HomePage extends StatelessWidget {
                         decoration: BoxDecoration(
                           color: Colors.white,
                           border: Border.all(
-                            color: Color(0xFFDDDDDD),
+                            color: const Color(0xFFDDDDDD),
                             width: 1,
                           ),
                           borderRadius: BorderRadius.circular(9),
@@ -40,9 +40,9 @@ class HomePage extends StatelessWidget {
                         child: const Icon(Icons.person, color: Colors.grey),
                       ),
                       const SizedBox(width: 12),
-                      Column(
+                      const Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        children: const [
+                        children: [
                           Text(
                             'July 14, 2023',
                             style: TextStyle(fontSize: 12, color: Colors.grey),
@@ -64,7 +64,7 @@ class HomePage extends StatelessWidget {
                     width: 40,
                     height: 40,
                     decoration: BoxDecoration(
-                      border: Border.all(color: Color(0xFFD9D9D9)),
+                      border: Border.all(color: const Color(0xFFD9D9D9)),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: const Icon(Icons.notifications_active),
@@ -92,7 +92,7 @@ class HomePage extends StatelessWidget {
                       width: 40,
                       height: 40,
                       decoration: BoxDecoration(
-                        border: Border.all(color: Color(0xFFD9D9D9)),
+                        border: Border.all(color: const Color(0xFFD9D9D9)),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: const Icon(Icons.search),

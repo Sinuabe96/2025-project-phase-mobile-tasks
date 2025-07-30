@@ -47,9 +47,9 @@ class _DetailsPageState extends State<DetailsPage> {
               const SizedBox(height: 24),
 
               // Title & Rating
-              Row(
+              const Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: const [
+                children: [
                   Text(
                     'Derby Leather',
                     style: TextStyle(
@@ -70,9 +70,9 @@ class _DetailsPageState extends State<DetailsPage> {
               const SizedBox(height: 8),
 
               // Category and Price
-              Row(
+              const Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: const [
+                children: [
                   Text(
                     "Men's shoe",
                     style: TextStyle(fontSize: 14, color: Colors.grey),

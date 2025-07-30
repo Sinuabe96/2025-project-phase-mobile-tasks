@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'pages/home_page.dart';
-import 'pages/details_page.dart';
-import 'pages/search_page.dart';
+
 import 'pages/add_update_page.dart';
+import 'pages/details_page.dart';
+import 'pages/home_page.dart';
+import 'pages/search_page.dart';
 
 void main() {
   runApp(const MyApp());

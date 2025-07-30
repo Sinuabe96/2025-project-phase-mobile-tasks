@@ -26,15 +26,15 @@ class _AddUpdatePageState extends State<AddUpdatePage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Header
-              Row(
+              const Row(
                 children: [
-                  const Icon(Icons.arrow_back_ios_new, color: Colors.black),
-                  const Spacer(),
-                  const Text(
+                  Icon(Icons.arrow_back_ios_new, color: Colors.black),
+                  Spacer(),
+                  Text(
                     'Add Product',
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
                   ),
-                  const Spacer(flex: 2),
+                  Spacer(flex: 2),
                 ],
               ),
 
@@ -71,7 +71,7 @@ class _AddUpdatePageState extends State<AddUpdatePage> {
               const SizedBox(height: 24),
 
               // Name
-              const Text("Name", style: TextStyle(fontSize: 16)),
+              const Text('Name', style: TextStyle(fontSize: 16)),
               const SizedBox(height: 8),
               Container(
                 height: 48,
@@ -90,7 +90,7 @@ class _AddUpdatePageState extends State<AddUpdatePage> {
               const SizedBox(height: 20),
 
               // Category
-              const Text("Category", style: TextStyle(fontSize: 16)),
+              const Text('Category', style: TextStyle(fontSize: 16)),
               const SizedBox(height: 8),
               Container(
                 height: 48,
@@ -109,7 +109,7 @@ class _AddUpdatePageState extends State<AddUpdatePage> {
               const SizedBox(height: 20),
 
               // Price
-              const Text("Price", style: TextStyle(fontSize: 16)),
+              const Text('Price', style: TextStyle(fontSize: 16)),
               const SizedBox(height: 8),
               Container(
                 height: 48,
@@ -138,7 +138,7 @@ class _AddUpdatePageState extends State<AddUpdatePage> {
               const SizedBox(height: 20),
 
               // Description
-              const Text("Description", style: TextStyle(fontSize: 16)),
+              const Text('Description', style: TextStyle(fontSize: 16)),
               const SizedBox(height: 8),
               Container(
                 height: 120,

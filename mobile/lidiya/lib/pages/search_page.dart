@@ -57,8 +57,8 @@ class SearchPage extends StatelessWidget {
                   border: Border.all(color: Colors.grey.shade300),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: Row(
-                  children: const [
+                child: const Row(
+                  children: [
                     Icon(Icons.arrow_back, size: 20),
                     SizedBox(width: 8),
                     Expanded(
@@ -81,8 +81,8 @@ class SearchPage extends StatelessWidget {
               // Filter Fields
               const Text('Category'),
               const SizedBox(height: 8),
-              TextField(
-                decoration: const InputDecoration(
+              const TextField(
+                decoration: InputDecoration(
                   hintText: 'Category',
                   border: OutlineInputBorder(),
                 ),
@@ -157,12 +157,12 @@ class _SearchProductCard extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 12),
-          Expanded(
+          const Expanded(
             child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 12),
+              padding: EdgeInsets.symmetric(vertical: 12),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: const [
+                children: [
                   Text(
                     'Derby Leather Shoes',
                     style: TextStyle(fontWeight: FontWeight.w600),
