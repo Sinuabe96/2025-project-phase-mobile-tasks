@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:lidiya/features/product/data/models/product_model.dart';
+import '../../../../../features/product/data/models/product_model.dart';
 
 void main() {
   final productJson = {
