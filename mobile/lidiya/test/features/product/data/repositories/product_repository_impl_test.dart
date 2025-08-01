@@ -7,6 +7,7 @@ import 'package:lidiya/features/product/data/datasources/local_data_source.dart'
 import 'package:lidiya/features/product/data/models/product_model.dart';
 import 'package:lidiya/features/product/domain/entities/product.dart';
 import 'package:lidiya/core/network/network_info.dart';
+import 'package:lidiya/core/errors/network_exception.dart';
 
 import 'product_repository_impl_test.mocks.dart';
 
@@ -105,7 +106,7 @@ void main() {
       verify(mockLocalDataSource.getAllProducts()).called(1);
     });
 
-    test('should return empty list when both network and local fail', () async {
+    test('should throw NetworkException when both network and local fail', () async {
       // arrange
       when(mockNetworkInfo.isConnected).thenAnswer((_) async => true);
       when(mockLocalDataSource.getAllProducts())
@@ -113,14 +114,30 @@ void main() {
       when(mockRemoteDataSource.getAllProducts())
           .thenThrow(Exception('Network error'));
 
-      // act
-      final result = await repository.getAllProducts();
-
-      // assert
-      expect(result, isEmpty);
+      // act & assert
+      expect(
+        () => repository.getAllProducts(),
+        throwsA(isA<NetworkException>()),
+      );
       verify(mockNetworkInfo.isConnected).called(1);
       verify(mockRemoteDataSource.getAllProducts()).called(1);
       verify(mockLocalDataSource.getAllProducts()).called(1);
+    });
+
+    test('should throw NoNetworkConnectionException when no network and no local data', () async {
+      // arrange
+      when(mockNetworkInfo.isConnected).thenAnswer((_) async => false);
+      when(mockLocalDataSource.getAllProducts())
+          .thenAnswer((_) async => []);
+
+      // act & assert
+      expect(
+        () => repository.getAllProducts(),
+        throwsA(isA<NoNetworkConnectionException>()),
+      );
+      verify(mockNetworkInfo.isConnected).called(1);
+      verify(mockLocalDataSource.getAllProducts()).called(1);
+      verifyNever(mockRemoteDataSource.getAllProducts());
     });
   });
 
@@ -177,6 +194,24 @@ void main() {
       // assert
       expect(result, isA<Product>());
       expect(result?.name, 'Test Product');
+      verify(mockNetworkInfo.isConnected).called(1);
+      verify(mockRemoteDataSource.getProductById('1')).called(1);
+      verify(mockLocalDataSource.getProductById('1')).called(1);
+    });
+
+    test('should throw NetworkException when remote fails and no local data', () async {
+      // arrange
+      when(mockNetworkInfo.isConnected).thenAnswer((_) async => true);
+      when(mockLocalDataSource.getProductById('1'))
+          .thenAnswer((_) async => null);
+      when(mockRemoteDataSource.getProductById('1'))
+          .thenThrow(Exception('Network error'));
+
+      // act & assert
+      expect(
+        () => repository.getProductById('1'),
+        throwsA(isA<NetworkException>()),
+      );
       verify(mockNetworkInfo.isConnected).called(1);
       verify(mockRemoteDataSource.getProductById('1')).called(1);
       verify(mockLocalDataSource.getProductById('1')).called(1);
