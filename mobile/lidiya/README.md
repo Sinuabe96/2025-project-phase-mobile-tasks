@@ -116,6 +116,48 @@ The `ProductRepositoryImpl` orchestrates between remote and local data sources:
 - **Synchronization**: Keeps local and remote data in sync
 - **Error Handling**: Graceful handling of network and storage failures
 
+## 🌐 Network-Aware Repository (Task 12)
+
+### Network Information Contract
+
+The `NetworkInfo` abstract class provides network connectivity status:
+
+- `isConnected`: Returns true if device has internet connectivity
+
+### Enhanced Repository Implementation
+
+The `ProductRepositoryImpl` now includes intelligent network-aware logic:
+
+#### **Network Available Strategy:**
+
+- **Read Operations**: Fetch from remote, cache locally, return fresh data
+- **Write Operations**: Update remote first, then sync to local cache
+- **Fallback**: If remote fails, use local data for reads, still cache locally for writes
+
+#### **Network Unavailable Strategy:**
+
+- **Read Operations**: Return cached local data only
+- **Write Operations**: Cache locally for offline support
+- **Sync**: Changes are queued locally and will sync when network returns
+
+#### **Key Features:**
+
+- ✅ **Offline-First**: App works without internet connection
+- ✅ **Intelligent Caching**: Automatic local caching of remote data
+- ✅ **Error Resilience**: Graceful handling of network failures
+- ✅ **Data Consistency**: Local and remote data synchronization
+- ✅ **Performance**: Fast local access with background remote sync
+
+### Comprehensive Testing
+
+The repository includes extensive unit tests covering:
+
+- **Network Available Scenarios**: Remote success, remote failure with local fallback
+- **Network Unavailable Scenarios**: Local-only operations
+- **Error Handling**: Network errors, local storage errors
+- **Data Consistency**: Proper caching and synchronization
+- **All CRUD Operations**: Create, Read, Update, Delete with network awareness
+
 ## 🚀 Usage
 
 ### Product Operations
