@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../models/product_model.dart';
 import 'remote_data_source.dart';
+import '../../../../core/utils/error_handler.dart';
+import '../../../../core/utils/api_constants.dart';
 
 class RemoteDataSourceImpl implements RemoteDataSource {
   final http.Client client;
@@ -9,7 +11,7 @@ class RemoteDataSourceImpl implements RemoteDataSource {
 
   RemoteDataSourceImpl({
     required this.client,
-    this.baseUrl = 'https://api.example.com/products',
+    this.baseUrl = ApiConstants.defaultBaseUrl,
   });
 
   @override
@@ -17,13 +19,14 @@ class RemoteDataSourceImpl implements RemoteDataSource {
     try {
       final response = await client.get(Uri.parse(baseUrl));
       
-      if (response.statusCode == 200) {
+      if (response.statusCode == ApiConstants.ok) {
         final List<dynamic> jsonList = json.decode(response.body);
         return jsonList.map((json) => ProductModel.fromJson(json)).toList();
       } else {
-        throw Exception('Failed to load products');
+        throw ErrorHandler.handleApiError(response.statusCode, 'getAllProducts');
       }
     } catch (e) {
+      ErrorHandler.logError('getAllProducts', e);
       // For demo purposes, return mock data when API fails
       return _getMockProducts();
     }
@@ -34,13 +37,14 @@ class RemoteDataSourceImpl implements RemoteDataSource {
     try {
       final response = await client.get(Uri.parse('$baseUrl/$id'));
       
-      if (response.statusCode == 200) {
+      if (response.statusCode == ApiConstants.ok) {
         final json = jsonDecode(response.body);
         return ProductModel.fromJson(json);
       } else {
         return null;
       }
     } catch (e) {
+      ErrorHandler.logError('getProductById', e);
       // For demo purposes, return mock product when API fails
       final mockProducts = _getMockProducts();
       return mockProducts.firstWhere(
@@ -55,14 +59,15 @@ class RemoteDataSourceImpl implements RemoteDataSource {
     try {
       final response = await client.post(
         Uri.parse(baseUrl),
-        headers: {'Content-Type': 'application/json'},
+        headers: ApiConstants.jsonHeaders,
         body: json.encode(product.toJson()),
       );
       
-      if (response.statusCode != 201) {
-        throw Exception('Failed to create product');
+      if (response.statusCode != ApiConstants.created) {
+        throw ErrorHandler.handleApiError(response.statusCode, 'createProduct');
       }
     } catch (e) {
+      ErrorHandler.logError('createProduct', e);
       // For demo purposes, just simulate success
       print('Product created: ${product.name}');
     }
@@ -73,14 +78,15 @@ class RemoteDataSourceImpl implements RemoteDataSource {
     try {
       final response = await client.put(
         Uri.parse('$baseUrl/${product.id}'),
-        headers: {'Content-Type': 'application/json'},
+        headers: ApiConstants.jsonHeaders,
         body: json.encode(product.toJson()),
       );
       
-      if (response.statusCode != 200) {
-        throw Exception('Failed to update product');
+      if (response.statusCode != ApiConstants.ok) {
+        throw ErrorHandler.handleApiError(response.statusCode, 'updateProduct');
       }
     } catch (e) {
+      ErrorHandler.logError('updateProduct', e);
       // For demo purposes, just simulate success
       print('Product updated: ${product.name}');
     }
@@ -91,10 +97,11 @@ class RemoteDataSourceImpl implements RemoteDataSource {
     try {
       final response = await client.delete(Uri.parse('$baseUrl/$id'));
       
-      if (response.statusCode != 204) {
-        throw Exception('Failed to delete product');
+      if (response.statusCode != ApiConstants.noContent) {
+        throw ErrorHandler.handleApiError(response.statusCode, 'deleteProduct');
       }
     } catch (e) {
+      ErrorHandler.logError('deleteProduct', e);
       // For demo purposes, just simulate success
       print('Product deleted: $id');
     }

@@ -5,8 +5,9 @@ import '../datasources/remote_data_source.dart';
 import '../models/product_model.dart';
 import '../../../../core/network/network_info.dart';
 import '../../../../core/errors/network_exception.dart';
+import '../../../../core/base/base_repository.dart';
 
-class ProductRepositoryImpl implements ProductRepository {
+class ProductRepositoryImpl extends BaseRepository implements ProductRepository {
   final RemoteDataSource remoteDataSource;
   final LocalDataSource localDataSource;
   final NetworkInfo networkInfo;
@@ -34,21 +35,21 @@ class ProductRepositoryImpl implements ProductRepository {
           // Cache the remote data locally
           await localDataSource.cacheProducts(remoteProducts);
           
-          return remoteProducts;
+          return _convertToEntityList(remoteProducts);
         } catch (e) {
           // If remote fails but we have local data, return local
           if (localProducts.isNotEmpty) {
             print('Remote fetch failed, using cached data: $e');
-            return localProducts;
+            return _convertToEntityList(localProducts);
           }
           // If both fail, throw network exception
-          throw NetworkException('Failed to fetch products from remote and no cached data available');
+          throw _handleNetworkError(e, 'getAllProducts');
         }
       } else {
         // Network unavailable, return local data
         if (localProducts.isNotEmpty) {
           print('No network connection, using cached data');
-          return localProducts;
+          return _convertToEntityList(localProducts);
         } else {
           throw NoNetworkConnectionException();
         }
@@ -57,7 +58,7 @@ class ProductRepositoryImpl implements ProductRepository {
       if (e is NetworkException) {
         rethrow;
       }
-      throw NetworkException('Unexpected error while fetching products: $e');
+      throw _handleNetworkError(e, 'getAllProducts');
     }
   }
 
@@ -78,22 +79,22 @@ class ProductRepositoryImpl implements ProductRepository {
           if (remoteProduct != null) {
             // Cache the product locally
             await localDataSource.createProduct(remoteProduct);
-            return remoteProduct;
+            return _convertToEntity(remoteProduct);
           }
         } catch (e) {
           // If remote fails, return local product if available
           if (localProduct != null) {
             print('Remote fetch failed for product $id, using cached data: $e');
-            return localProduct;
+            return _convertToEntity(localProduct);
           }
-          throw NetworkException('Failed to fetch product $id from remote and no cached data available');
+          throw _handleNetworkError(e, 'getProductById');
         }
       }
       
       // Return local product or null
       if (localProduct != null) {
         print('No network connection, using cached product $id');
-        return localProduct;
+        return _convertToEntity(localProduct);
       }
       
       return null;
@@ -101,20 +102,18 @@ class ProductRepositoryImpl implements ProductRepository {
       if (e is NetworkException) {
         rethrow;
       }
-      throw NetworkException('Unexpected error while fetching product $id: $e');
+      throw _handleNetworkError(e, 'getProductById');
     }
   }
 
   @override
   Future<void> createProduct(Product product) async {
     try {
-      final productModel = ProductModel(
-        id: product.id,
-        name: product.name,
-        description: product.description,
-        imageUrl: product.imageUrl,
-        price: product.price,
-      );
+      if (!_validateProduct(product)) {
+        throw Exception('Invalid product data');
+      }
+      
+      final productModel = _convertToModel(product);
       
       // Check if network is available
       final isConnected = await networkInfo.isConnected;
@@ -135,20 +134,18 @@ class ProductRepositoryImpl implements ProductRepository {
       // Always cache locally for offline support
       await localDataSource.createProduct(productModel);
     } catch (e) {
-      throw NetworkException('Failed to create product: $e');
+      throw _handleNetworkError(e, 'createProduct');
     }
   }
 
   @override
   Future<void> updateProduct(Product product) async {
     try {
-      final productModel = ProductModel(
-        id: product.id,
-        name: product.name,
-        description: product.description,
-        imageUrl: product.imageUrl,
-        price: product.price,
-      );
+      if (!_validateProduct(product)) {
+        throw Exception('Invalid product data');
+      }
+      
+      final productModel = _convertToModel(product);
       
       // Check if network is available
       final isConnected = await networkInfo.isConnected;
@@ -169,7 +166,7 @@ class ProductRepositoryImpl implements ProductRepository {
       // Always update local cache for offline support
       await localDataSource.updateProduct(productModel);
     } catch (e) {
-      throw NetworkException('Failed to update product: $e');
+      throw _handleNetworkError(e, 'updateProduct');
     }
   }
 
@@ -195,7 +192,50 @@ class ProductRepositoryImpl implements ProductRepository {
       // Always remove from local cache for offline support
       await localDataSource.deleteProduct(id);
     } catch (e) {
-      throw NetworkException('Failed to delete product: $e');
+      throw _handleNetworkError(e, 'deleteProduct');
     }
+  }
+
+  List<Product> _convertToEntityList(List<ProductModel> models) {
+    return models.map((model) => _convertToEntity(model)).toList();
+  }
+
+  Product _convertToEntity(ProductModel model) {
+    // Assuming ProductModel extends/implements Product or has a toEntity() method
+    // Adjust this conversion as per your actual model/entity structure
+    return Product(
+      id: model.id,
+      name: model.name,
+      description: model.description,
+      price: model.price,
+      imageUrl: model.imageUrl,
+      // Add other fields as necessary
+    );
+  }
+
+  ProductModel _convertToModel(Product product) {
+    // Adjust this conversion as per your actual model/entity structure
+    return ProductModel(
+      id: product.id,
+      name: product.name,
+      description: product.description,
+      price: product.price,
+      imageUrl: product.imageUrl,
+      // Add other fields as necessary
+    );
+  }
+
+  Exception _handleNetworkError(dynamic error, String methodName) {
+    // You can customize this logic as needed
+    if (error is NetworkException) {
+      return error;
+    }
+    return NetworkException('Error in $methodName: ${error.toString()}');
+  }
+
+  bool _validateProduct(Product product) {
+    // Basic validation: check required fields are not null or empty
+    return product.id.isNotEmpty &&
+        product.name.isNotEmpty;
   }
 } 
