@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
+import 'core/di/injection_container.dart' as di;
 
 import 'features/product/presentation/pages/add_update_page.dart';
 import 'features/product/presentation/pages/details_page.dart';
 import 'features/product/presentation/pages/home_page.dart';
 import 'features/product/presentation/pages/search_page.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await di.init();
   runApp(const MyApp());
 }
 
